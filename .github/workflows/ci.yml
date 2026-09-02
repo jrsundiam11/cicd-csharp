@@ -1,0 +1,58 @@
+name: CI - Build & Test
+
+# This workflow runs the build + test suite on every push and on every
+# pull request that targets main or develop. It does NOT merge anything
+# itself — GitHub Actions never blocks a merge on its own. What blocks
+# the merge is a branch protection rule (configured in repo Settings)
+# that requires this workflow's job to finish with a green checkmark
+# before the "Merge" button on a PR becomes clickable.
+#
+# See README.md for the exact branch protection steps.
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    name: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build (Release, no restore)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run xUnit tests
+        # If any test fails, `dotnet test` exits non-zero, the step fails,
+        # the job fails, and the required status check reports "failed".
+        run: >
+          dotnet test
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory ./TestResults
+
+      - name: Publish test results
+        # Runs even if the test step above failed, so the PR shows a
+        # readable summary of exactly which tests failed and why.
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: xUnit Test Results
+          path: ./TestResults/*.trx
+          reporter: dotnet-trx
+          fail-on-error: true
