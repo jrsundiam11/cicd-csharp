@@ -64,10 +64,10 @@ public class CalculatorTests
     // DEMO ONLY: uncomment this test to see the pipeline fail and block
     // the pull request from being merged (see README.md, "Demo a failure").
     // ------------------------------------------------------------------
-    // [Fact]
-    // public void Add_IntentionallyBroken_ToDemonstrateFailingPipeline()
-    // {
-    //     var result = _calculator.Add(2, 2);
-    //     Assert.Equal(5, result); // wrong on purpose
-    // }
+    [Fact]
+    public void Add_IntentionallyBroken_ToDemonstrateFailingPipeline()
+    {
+        var result = _calculator.Add(2, 2);
+        Assert.Equal(5, result); // wrong on purpose
+    }
 }
