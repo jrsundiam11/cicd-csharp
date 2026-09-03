@@ -68,6 +68,6 @@ public class CalculatorTests
     public void Add_IntentionallyBroken_ToDemonstrateFailingPipeline()
     {
         var result = _calculator.Add(2, 2);
-        Assert.Equal(5, result); // wrong on purpose
+        Assert.Equal(5, result); // wrong on purpose 
     }
 }
